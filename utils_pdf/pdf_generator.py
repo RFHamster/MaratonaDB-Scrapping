@@ -3,12 +3,15 @@ from fpdf import FPDF
 # Docs
 # https://pyfpdf.readthedocs.io/en/latest/Tutorial/index.html
 
+
 class PDF(FPDF):
     def __init__(self, titulo, origem, idOriginal):
         super().__init__()
         self.titulo = titulo
         self.origem = origem
         self.idOriginal = idOriginal
+        self.set_title(titulo)
+        self.set_author(origem)
 
     def header(self):
         self.set_font('Arial', 'B', 16)
@@ -24,9 +27,11 @@ class PDF(FPDF):
         self.set_font('Arial', 'I', 9)
         # Text color in gray
         self.set_text_color(128)
-        bootom = self.origem + " | " + self.idOriginal
+        bootom = self.origem + ' | ' + self.idOriginal
         # Page number
-        self.cell(0, 10, bootom + " - Página " +  str(self.page_no()), 0, 0, 'C')
+        self.cell(
+            0, 10, bootom + ' - Página ' + str(self.page_no()), 0, 0, 'C'
+        )
 
     def add_topic(self, titulo_topico: str):
         self.set_fill_color(255, 255, 255)
@@ -36,7 +41,7 @@ class PDF(FPDF):
     def plot_teste(self):
         self.add_page()
         # Arial 12
-        self.add_topic("Capitulo Teste")
+        self.add_topic('Capitulo Teste')
         # Line break
         self.ln(4)
         # Read text file
@@ -45,16 +50,12 @@ class PDF(FPDF):
         self.set_font('Times', '', 12)
         # Output justified text
         self.multi_cell(0, 5, txt)
-        self.ln()
-        self.multi_cell(0, 5, txt)
-        self.ln()
-        self.multi_cell(0, 5, txt)
         # Line break
         self.ln()
 
-    def plot_pdf_scrapping(self):
+    def plot_pdf_scrapping_bee(self):
         self.add_page()
-        self.add_topic("Capitulo Teste")
+        self.add_topic('Capitulo Teste')
         # Line break
         self.ln(4)
         # Read text file
@@ -68,9 +69,3 @@ class PDF(FPDF):
 
         # Line break
         self.ln()
-
-pdf = PDF("Titulo", "Beecrownd", "2023")
-pdf.plot_pdf_scrapping()
-pdf.set_title(title)
-pdf.set_author('Jules Verne')
-pdf.output('tuto3.pdf', 'F')
