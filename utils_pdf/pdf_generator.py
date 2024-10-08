@@ -66,6 +66,8 @@ class PDF(FPDF):
             os.remove('temp_image.jpg')
 
     def clean_text(self, text):
+        text = re.sub(r'≤', '<=', text)
+        text = re.sub(r'≥', '>=', text)
         return re.sub(r'[^\x00-\xFF]+', ' ', text)
 
     def write_descendant(self, tag):
