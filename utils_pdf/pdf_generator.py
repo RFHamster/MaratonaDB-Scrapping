@@ -73,11 +73,11 @@ class PDF(FPDF):
     def write_descendant(self, tag):
         if tag.name is not None:
             if (
-                    tag.name == 'li'
-                    or tag.name == 'em'
-                    or tag.name == 'strong'
-                    or tag.name == 'tt'
-                    or tag.name == 'i'
+                tag.name == 'li'
+                or tag.name == 'em'
+                or tag.name == 'strong'
+                or tag.name == 'tt'
+                or tag.name == 'i'
             ):
                 return False
 
@@ -92,7 +92,6 @@ class PDF(FPDF):
                     self.multi_cell(0, 5, cleaned_text)
                     self.ln()
         return True
-
 
     def plot_pdf_scrapping_bee(self, soup_bee):
         self.add_page()
@@ -131,6 +130,10 @@ class PDF(FPDF):
             for desc in tdSaida.find_all():
                 self.write_descendant(desc)
 
-            self.multi_cell(0, 5, "------------------------------------------------------------------------------------------------------------------")
+            self.multi_cell(
+                0,
+                5,
+                '------------------------------------------------------------------------------------------------------------------',
+            )
 
         self.ln()

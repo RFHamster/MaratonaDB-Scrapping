@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from selenium.webdriver import Firefox
 from selenium.webdriver import FirefoxService
 
-origem = 'Beecrownd'
+origem = 'CodeForces'
 
 
 def make_scrapping(url: str):
@@ -12,11 +12,10 @@ def make_scrapping(url: str):
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     driver.close()
     try:
-        header = soup.find('div', class_='header')
-        titulo = header.find('h1').text
-        idOriginal = header.find('span').text.split(' ')[-1]
-        problema = soup.find('div', class_='problem')
-
+        idOriginal = soup.title.string.replace(' ', '').split('-')[1]
+        titulo = soup.find('div', class_='title').text
+        origem = soup.find('th', class_='left').text + ' | CodeForces'
+        problema = soup.find('div', class_='problemindexholder')
         return dict(
             titulo=titulo,
             idOriginal=idOriginal,
