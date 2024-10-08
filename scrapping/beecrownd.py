@@ -16,7 +16,12 @@ def make_scrapping(url: str):
         idOriginal = header.find('span').text.split(' ')[-1]
         problema = soup.find('div', class_='problem')
         driver.close()
-        return dict(titulo = titulo, idOriginal = idOriginal, problema = problema, origem=origem)
+        return dict(
+            titulo=titulo,
+            idOriginal=idOriginal,
+            problema=problema,
+            origem=origem,
+        )
     except:
         driver.close()
         return dict()
