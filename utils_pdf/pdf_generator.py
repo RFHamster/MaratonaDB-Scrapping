@@ -109,4 +109,26 @@ class PDF(FPDF):
         for tag in soup_bee.find('div', class_='output').descendants:
             self.write_descendant(tag)
 
+        div_both = soup_bee.find('div', class_='both')
+        next_tables = div_both.find_all_next('table')
+
+        for table in next_tables:
+            tbody = table.find('tbody')
+            tds = tbody.find_all('td')
+
+            tdEntrada = tds[0]
+            tdSaida = tds[1]
+
+            self.add_topic('Exemplo de Entrada')
+            self.ln(2)
+            for desc in tdEntrada.find_all():
+                self.write_descendant(desc)
+
+            self.add_topic('Exemplo de Saida')
+            self.ln(2)
+            for desc in tdSaida.find_all():
+                self.write_descendant(desc)
+
+            self.multi_cell(0, 5, "------------------------------------------------------------------------------------------------------------------")
+
         self.ln()

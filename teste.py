@@ -2,7 +2,7 @@ from scrapping import beecrownd
 from utils_pdf.pdf_generator import PDF
 
 rootURL = 'https://www.beecrowd.com.br'
-rootURL = rootURL + '/repository/UOJ_1100.html'
+rootURL = rootURL + '/repository/UOJ_1021.html'
 dicionarioBee = beecrownd.make_scrapping(rootURL)
 
 pdf = PDF(
