@@ -3,6 +3,8 @@ import re
 import requests
 import os
 from PIL import Image
+import io
+
 
 # Docs
 # https://pyfpdf.readthedocs.io/en/latest/Tutorial/index.html
@@ -50,20 +52,26 @@ class PDF(FPDF):
     def add_image_from_url(self, url):
         response = requests.get(url)
         if response.status_code == 200:
-            with open('temp_image.jpg', 'wb') as f:
-                f.write(response.content)
-            with Image.open('temp_image.jpg') as img:
-                img_width, img_height = img.size
+            # with open('temp_image.jpg', 'wb') as f:
+            #     f.write(response.content)
+            # with Image.open('temp_image.jpg') as img:
+            #     img_width, img_height = img.size
+
+            img = Image.open(io.BytesIO(response.content))
+            img_width, img_height = img.size
 
             img_width_mm = img_width * 0.264583
             img_height_mm = img_height * 0.264583
 
             x = (self.w - img_width_mm) / 2
 
-            self.image('temp_image.jpg', x=x, y=self.get_y(), w=img_width_mm)
+            temp_image_path = 'temp_image.' + img.format.lower()
+            img.save(temp_image_path)
+
+            self.image(temp_image_path, x=x, y=self.get_y(), w=img_width_mm)
             self.ln(img_height_mm + 2)
             # Remove o arquivo temporário após uso
-            os.remove('temp_image.jpg')
+            os.remove(temp_image_path)
 
     def clean_text(self, text):
         text = re.sub(r'≤', '<=', text)
@@ -180,17 +188,25 @@ class PDF(FPDF):
         self.add_page()
         self.set_font('Times', '', 12)
 
-        for tag in soup_cf.find('div', class_='input-specification').find_previous_sibling('div').descendants:
+        for tag in (
+            soup_cf.find('div', class_='input-specification')
+            .find_previous_sibling('div')
+            .descendants
+        ):
             self.write_descendant_cf(tag)
 
         # self.add_topic('Entradas')
         # self.ln(4)
-        for tag in soup_cf.find('div', class_='input-specification').descendants:
+        for tag in soup_cf.find(
+            'div', class_='input-specification'
+        ).descendants:
             self.write_descendant_cf(tag)
 
         # self.add_topic('Saidas')
         # self.ln(4)
-        for tag in soup_cf.find('div', class_='output-specification').descendants:
+        for tag in soup_cf.find(
+            'div', class_='output-specification'
+        ).descendants:
             self.write_descendant_cf(tag)
 
         self.add_topic('Exemplo(s)')
@@ -209,14 +225,14 @@ class PDF(FPDF):
             self.add_topic('Exemplo de Entrada')
             self.ln(2)
             for desc in inputs[i].find_all():
-                if "Copy" in desc.get_text() or desc.name == 'pre':
+                if 'Copy' in desc.get_text() or desc.name == 'pre':
                     continue
                 self.write_descendant_cf(desc)
 
             self.add_topic('Exemplo de Saida')
             self.ln(2)
             for desc in outputs[i].find_all():
-                if "Copy" in desc.get_text():
+                if 'Copy' in desc.get_text():
                     continue
                 self.write_descendant_cf(desc)
 
