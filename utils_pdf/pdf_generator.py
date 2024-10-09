@@ -68,6 +68,7 @@ class PDF(FPDF):
     def clean_text(self, text):
         text = re.sub(r'≤', '<=', text)
         text = re.sub(r'≥', '>=', text)
+        text = re.sub(r'—', '-', text)
         return re.sub(r'[^\x00-\xFF]+', ' ', text)
 
     def write_descendant(self, tag):
@@ -113,6 +114,12 @@ class PDF(FPDF):
         div_both = soup_bee.find('div', class_='both')
         next_tables = div_both.find_all_next('table')
 
+        self.add_topic('Exemplo(s)')
+        self.multi_cell(
+            0,
+            5,
+            '------------------------------------------------------------------------------------------------------------------',
+        )
         for table in next_tables:
             tbody = table.find('tbody')
             tds = tbody.find_all('td')
@@ -129,6 +136,89 @@ class PDF(FPDF):
             self.ln(2)
             for desc in tdSaida.find_all():
                 self.write_descendant(desc)
+
+            self.multi_cell(
+                0,
+                5,
+                '------------------------------------------------------------------------------------------------------------------',
+            )
+
+        self.ln()
+
+    def write_descendant_cf(self, tag):
+        if tag.name is not None:
+            if (
+                tag.name == 'li'
+                or tag.name == 'em'
+                or tag.name == 'strong'
+                or tag.name == 'tt'
+                or tag.name == 'i'
+                or tag.name == 'span'
+                or tag.name == 'nobr'
+                or tag.name == 'script'
+                or tag.name == 'mi'
+                or tag.name == 'mo'
+                or tag.name == 'math'
+                or tag.name == 'msub'
+                or tag.name == 'msup'
+                or tag.name == 'mn'
+            ):
+                return False
+            if tag.name == 'img':
+                self.add_image_from_url(tag.get('src'))
+            else:
+                if tag.get_text() == '':
+                    return False
+
+                cleaned_text = self.clean_text(tag.get_text())
+                if cleaned_text.strip():
+                    self.multi_cell(0, 5, cleaned_text)
+                    self.ln()
+        return True
+
+    def plot_pdf_scrapping_cf(self, soup_cf):
+        self.add_page()
+        self.set_font('Times', '', 12)
+
+        for tag in soup_cf.find('div', class_='input-specification').find_previous_sibling('div').descendants:
+            self.write_descendant_cf(tag)
+
+        # self.add_topic('Entradas')
+        # self.ln(4)
+        for tag in soup_cf.find('div', class_='input-specification').descendants:
+            self.write_descendant_cf(tag)
+
+        # self.add_topic('Saidas')
+        # self.ln(4)
+        for tag in soup_cf.find('div', class_='output-specification').descendants:
+            self.write_descendant_cf(tag)
+
+        self.add_topic('Exemplo(s)')
+        self.multi_cell(
+            0,
+            5,
+            '------------------------------------------------------------------------------------------------------------------',
+        )
+
+        div_both = soup_cf.find('div', class_='sample-test')
+        inputs = div_both.find_all_next('div', class_='input')
+        outputs = div_both.find_all_next('div', class_='output')
+
+        for i in range(len(inputs)):
+
+            self.add_topic('Exemplo de Entrada')
+            self.ln(2)
+            for desc in inputs[i].find_all():
+                if "Copy" in desc.get_text() or desc.name == 'pre':
+                    continue
+                self.write_descendant_cf(desc)
+
+            self.add_topic('Exemplo de Saida')
+            self.ln(2)
+            for desc in outputs[i].find_all():
+                if "Copy" in desc.get_text():
+                    continue
+                self.write_descendant_cf(desc)
 
             self.multi_cell(
                 0,
