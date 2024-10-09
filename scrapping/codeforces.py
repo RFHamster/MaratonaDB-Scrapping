@@ -6,8 +6,10 @@ origem = 'CodeForces'
 
 
 def make_scrapping(url: str):
-    service = FirefoxService('/snap/bin/firefox.geckodriver')
-    driver = Firefox(service=service)
+    # Only for Deb
+    # service = FirefoxService('/snap/bin/firefox.geckodriver')
+    # driver = Firefox(service=service)
+    driver = Firefox()
     driver.get(url)
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     driver.close()
