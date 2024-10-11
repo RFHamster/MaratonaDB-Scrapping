@@ -1,1 +1,1 @@
-API_BACKEND_URL = 'localhost:8080/'
+API_BACKEND_URL = 'http://localhost:8080/'
